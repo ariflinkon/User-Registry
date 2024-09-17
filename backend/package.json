@@ -2,6 +2,7 @@
   "name": "User Registry",
   "version": "1.0.0",
   "scripts": {
+    "start": "node index.js",
     "build": "webpack --config webpack.config.js"
   },
   "dependencies": {
@@ -12,6 +13,7 @@
     "mysql2": "^3.11.3"
   },
   "devDependencies": {
+    "webpack": "^5.0.0",
     "webpack-cli": "^4.10.0"
   }
 }
