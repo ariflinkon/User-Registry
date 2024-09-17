@@ -68,7 +68,7 @@ function UserManagement() {
   const handleUnblockUsers = async () => {
     try {
       await axios.put(
-        'http://localhost:5000/api/users/status',
+        `${process.env.REACT_APP_API_URL}/users/status`,
         { userIds: selectedUsers, status: 'active' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -81,7 +81,7 @@ function UserManagement() {
 
   const handleDeleteUsers = async () => {
     try {
-      await axios.delete('http://localhost:5000/api/users', {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/users`, {
         data: { userIds: selectedUsers },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -91,7 +91,7 @@ function UserManagement() {
       console.error('Failed to delete users', error);
     }
   };
-
+  
   const handleLogout = () => {
     window.location.href = '/login';
   };
