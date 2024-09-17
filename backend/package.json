@@ -10,5 +10,8 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.10.0"
   }
 }
