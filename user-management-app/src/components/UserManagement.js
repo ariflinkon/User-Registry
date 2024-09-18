@@ -10,7 +10,7 @@ function UserManagement() {
   useEffect(() => {
     const fetchUsers = async () => {
       try { 
-        const response = await axios.get('http://localhost:5000/api/users', {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data);
@@ -21,7 +21,7 @@ function UserManagement() {
 
     const fetchUserName = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserName(response.data.name);
@@ -54,7 +54,7 @@ function UserManagement() {
   const handleBlockUsers = async () => {
     try {
       await axios.put(
-        'http://localhost:5000/api/users/status',
+        `${process.env.REACT_APP_API_URL}/api/users/status`,
         { userIds: selectedUsers, status: 'blocked' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
