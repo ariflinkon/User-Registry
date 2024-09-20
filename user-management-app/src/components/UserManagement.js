@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function UserManagement() {
@@ -9,23 +9,33 @@ function UserManagement() {
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
+  const checkAllUsersBlocked = useCallback((users) => {
+    const allBlocked = users.every(user => user.status === 'blocked');
+    if (allBlocked) {
+      handleLogout();
+    }
+  }, []);
+
   useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
 
+    // Fetch users from the API
     const fetchUsers = async () => {
       try { 
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data);
+        checkAllUsersBlocked(response.data);
       } catch (error) {
         console.error('Failed to fetch users', error);
       }
     };
 
+    // Fetch the current user's name from the API
     const fetchUserName = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`, {
@@ -39,8 +49,9 @@ function UserManagement() {
 
     fetchUsers();
     fetchUserName();
-  }, [token, navigate]);
+  }, [token, navigate, checkAllUsersBlocked]);
 
+  // Handle select all users checkbox
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allUserIds = users.map((user) => user.id);
@@ -50,6 +61,7 @@ function UserManagement() {
     }
   };
 
+  // Handle individual user selection
   const handleSelectUser = (e, id) => {
     if (e.target.checked) {
       setSelectedUsers([...selectedUsers, id]);
@@ -58,6 +70,7 @@ function UserManagement() {
     }
   };
 
+  // Handle blocking selected users
   const handleBlockUsers = async () => {
     try {
       await axios.put(
@@ -65,13 +78,16 @@ function UserManagement() {
         { userIds: selectedUsers, status: 'blocked' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setUsers(users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'blocked' } : user));
+      const updatedUsers = users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'blocked' } : user);
+      setUsers(updatedUsers);
       setSelectedUsers([]);
+      checkAllUsersBlocked(updatedUsers);
     } catch (error) {
       console.error('Failed to block users', error);
     }
   };
 
+  // Handle unblocking selected users
   const handleUnblockUsers = async () => {
     try {
       await axios.put(
@@ -86,6 +102,7 @@ function UserManagement() {
     }
   };
 
+  // Handle deleting selected users
   const handleDeleteUsers = async () => {
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/api/users`, {
@@ -99,6 +116,7 @@ function UserManagement() {
     }
   };
   
+  // Handle user logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
