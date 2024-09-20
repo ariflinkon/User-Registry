@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function UserManagement() {
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userName, setUserName] = useState('');
   const token = localStorage.getItem('token');
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchUsers = async () => {
       try { 
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users`, {
@@ -32,7 +39,7 @@ function UserManagement() {
 
     fetchUsers();
     fetchUserName();
-  }, [token]);
+  }, [token, navigate]);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -93,7 +100,8 @@ function UserManagement() {
   };
   
   const handleLogout = () => {
-    window.location.href = '/login';
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (
@@ -109,7 +117,7 @@ function UserManagement() {
           </button>
         </div>
         <div className="user-name">
-          <span>Welcome, {userName} </span>
+          <span>Welcome {userName} </span>
           <button className="btn btn-link" onClick={handleLogout}>Logout</button>
         </div>
       </div>
@@ -140,7 +148,7 @@ function UserManagement() {
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.last_login_time || 'Never'}</td>
+              <td>{user.last_login_time || 'N/A'}</td>
               <td>{user.registration_time}</td>
               <td>{user.status}</td>
             </tr>
